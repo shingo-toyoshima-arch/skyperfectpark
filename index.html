@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【予約完了】Sunset BBQ Party | 夢の島PRIVATE No.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #FFA07A;
+            --dark: #2D3436;
+            --light: #FAFAFA;
+            --glass-bg: rgba(255, 255, 255, 0.90);
+            --glass-border: rgba(255, 255, 255, 0.6);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans JP', sans-serif; color: var(--dark); background-color: var(--light); line-height: 1.7; overflow-x: hidden; }
+        h1, h2, h3, .en-font { font-family: 'Montserrat', sans-serif; }
+
+        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        .hero {
+            position: relative;
+            min-height: 35vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(45,52,54,0.65), rgba(255,107,107,0.65)), 
+                        url('https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/Animate_the_scene_at_dusk_Cut-ezgif.com-video-to-gif-converter.gif') center/cover no-repeat;
+            color: white;
+            padding: 50px 20px;
+        }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; letter-spacing: 3px; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .hero h2 { font-size: 1.4rem; font-weight: 700; color: #FFD700; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+
+        .container { max-width: 950px; margin: -40px auto 100px; padding: 0 20px; position: relative; z-index: 10; }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            transition: opacity 0.4s ease;
+        }
+
+        .sec-title { text-align: center; font-size: 1.8rem; margin-bottom: 25px; color: var(--dark); font-weight: 700; }
+        .sec-title span { display: block; font-size: 0.85rem; color: var(--primary); letter-spacing: 2px; margin-bottom: 4px; font-weight: bold; }
+
+        .iframe-container {
+            width: 100%;
+            height: 60vh;
+            min-height: 450px;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            border: 1px solid var(--glass-border);
+            background: #fff;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .line-account-box { background: #E8F5E9; border: 2px solid #C8E6C9; padding: 12px; border-radius: 14px; text-align: center; margin-bottom: 10px; }
+        .line-status-text { font-weight: 700; color: #2E7D32; font-size: 0.95rem; }
+        
+        .message-box { background: #fff; border-left: 4px solid var(--secondary); padding: 12px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #EAEAEA; }
+        .message-sender { font-weight: 700; color: var(--dark); font-size: 0.85rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .message-text { font-size: 0.9rem; color: #444; line-height: 1.5; white-space: pre-wrap; }
+
+        /* メニュー用のスタイル */
+        .menu-category { font-weight: bold; color: #d35400; margin-top: 25px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #ccc; }
+        .menu-list { list-style: none; padding: 0; margin: 0; }
+        .menu-list li { background: #fff8e7; margin-bottom: 12px; padding: 10px; border-radius: 8px; display: flex; align-items: center; border-left: 4px solid #f1c40f; }
+        .menu-img { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; margin-right: 15px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+        .menu-info { flex-grow: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .menu-name { font-weight: bold; color: #333; font-size: 0.95rem; }
+        .menu-price { font-weight: bold; color: #c0392b; font-size: 0.95rem; margin-left: auto; }
+        .total-budget { background-color: #e8f6f3; padding: 15px; border-radius: 8px; margin-top: 25px; text-align: center; border: 1px solid #1abc9c; font-size: 0.95rem; }
+
+        /* 画像ポップアップ（モーダル）用のスタイル追加 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-image {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            object-fit: contain;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-image {
+            transform: scale(1);
+        }
+        .close-modal {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0,0,0,0.6);
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+        }
+        /* 車割り当て用のスタイル (イベント風に調整) */
+        .car-allocation-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px; }
+        .car-card { 
+            background: linear-gradient(135deg, #ffffff, #fffdf8); 
+            border-radius: 16px; 
+            padding: 0; 
+            width: 100%; 
+            max-width: 290px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #fcebb6;
+        }
+        /* カードの上部のヘッダー部分 */
+        .car-name { 
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white; 
+            font-weight: 700; 
+            font-size: 1.15rem; 
+            padding: 12px 15px; 
+            text-align: center; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+        }
+        /* 「直」用の特別カラー */
+        .car-name.direct {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+        
+        .car-members { list-style: none; padding: 15px; margin: 0; }
+        .car-members li { 
+            padding: 8px 0; 
+            border-bottom: 1px dashed #e0e0e0; 
+            font-size: 0.95rem; 
+            text-align: center; 
+            color: #444;
+            font-weight: 500;
+        }
+        .car-members li:last-child { border-bottom: none; }
+        /* カードの右上にちょっとした装飾（リボン風） */
+        .car-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="fade-in">
+            <h1>SUNSET BBQ PARTY</h1>
+            <h2>参加ありがとうございます！</h2>
+            <p>10月17日(土) 江東区夢の島アウトドアスクエア<br>16:30〜20:30</p>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- LINE認証ステータス -->
+        <div class="glass-card fade-in" style="padding: 20px 25px 10px;">
+            <div class="line-account-box">
+                <p id="line-status" class="line-status-text">🔄 LINEアカウント情報を読み込み中...</p>
+                <p style="font-size: 0.8rem; color: #888; margin-top: 8px;">
+                    ※読み込み中のまま変わらない場合は、<a href="https://liff.line.me/2010768698-QSouqBB0" style="color: var(--primary); text-decoration: underline; font-weight: bold;">こちらをタップして開き直して</a>ください。
+                </p>
+                
+            </div>
+        </div>
+<!-- 車割り当てセクション -->
+        <div class="glass-card fade-in" id="car-section" style="display: none; border: 2px solid var(--secondary); background: #FFF9F5;">
+            <h2 class="sec-title" style="margin-bottom: 10px;"><span>CAR ALLOCATION</span>当日の車割り当て</h2>
+            <div id="car-container" class="car-allocation-container"></div>
+        </div>
+        <!-- お知らせセクション -->
+        <div class="glass-card fade-in" id="notice-section" style="display: none;">
+            <h2 class="sec-title"><span>MESSAGE</span>皆様からのメッセージ</h2>
+            <div id="messages-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+        
+        <!-- メニュー・予算案内セクション -->
+        <div class="glass-card fade-in">
+            <h2 class="sec-title"><span>MENU</span>BBQメニュー予定</h2>
+            <p style="text-align: center; font-size: 0.9rem; color: #555; margin-bottom: 20px;">会場オプションやコストコでの買い出しをして、メニューを準備予定！<br>みなさんは自分の飲み物（車の方はアルコール厳禁ｗ）だけで大丈夫です<br>（現在大人20名、お子様1名予定 / 会場2区画確保済み！）</p>
+
+            <div style="text-align: right; font-size: 0.8rem; color: #888; margin-bottom: 5px;">※画像をタップすると拡大します</div>
+
+            <div class="menu-category">【コストコ・買い出しお肉＆海鮮など】</div>
+            <ul class="menu-list">
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%82%B5%E3%83%BC%E3%83%A2%E3%83%B3%EF%BC%91.jpg" alt="サーモン" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">コストコ サーモン</span> <span class="menu-price">約4,000円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%83%97%E3%83%AB%E3%82%B3%E3%82%AE.jpg" alt="プルコギ" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">コストコ プルコギ</span> <span class="menu-price">約3,800円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%81%84%E3%81%A1%E3%81%BC.jpg" alt="イチボのステーキ" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">イチボのステーキ</span> <span class="menu-price">約3,000円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%82%B9%E3%83%9A%E3%82%A2%E3%83%AA%E3%83%96.jpg" alt="スペアリブ" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">カナダ産三元豚スペアリブ</span> <span class="menu-price">約1,500円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%82%BD%E3%83%BC%E3%82%BB%E3%83%BC%E3%82%B8.jpg" alt="フレッシュソーセージ" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">フレッシュソーセージ</span> <span class="menu-price">約1,500円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%83%9F%E3%83%8B%E3%83%94%E3%82%BF%E3%83%96%E3%83%AC%E3%83%83%E3%83%89.jpg" alt="ミニピタブレッド" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">ミニピタブレッド (10枚)</span> <span class="menu-price">約1,000円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%83%86%E3%82%A3%E3%83%A9%E3%83%9F%E3%82%B9.jpg" alt="ティラミス" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">ティラミス・ドルチェ</span> <span class="menu-price">約1,400円</span></div>
+                </li>
+            </ul>
+
+            <div class="menu-category">【追加・別候補（検討中）】</div>
+            <ul class="menu-list">
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%82%BF%E3%83%B3%E5%8E%9A%E5%88%87%E3%82%8A.jpg" alt="タン厚切り" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">カナダ産 タン厚切り焼肉用</span> <span class="menu-price">約4,500円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E8%B1%9A%E3%83%90%E3%83%A9.jpg" alt="豚バラ" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">三元豚バラ焼肉（サムギョプサル）</span> <span class="menu-price">約2,500円</span></div>
+                </li>
+            </ul>
+
+            <div class="menu-category">【会場オプションメニュー】</div>
+            <ul class="menu-list">
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%83%9B%E3%82%BF%E3%83%86.jpg" alt="ホタテ" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">北海道片貝ホタテ (4枚入×5)</span> <span class="menu-price">計7,150円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/paella.jpg" alt="パエリア" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">パエリア (5人前×2)</span> <span class="menu-price">計5,940円</span></div>
+                </li>
+                <li>
+                    <img src="https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/%E3%82%A2%E3%83%92%E3%83%BC%E3%82%B8%E3%83%A7.jpg" alt="アヒージョ" class="menu-img">
+                    <div class="menu-info"><span class="menu-name">海鮮アヒージョ (5人前×2)</span> <span class="menu-price">計2,860円</span></div>
+                </li>
+            </ul>
+
+            <div class="total-budget">
+                <p style="margin: 0; color: #16a085;">
+                    <strong>💰 現在の概算費用（予定）</strong><br>
+                    オプション・買い出し合計：約45,250円<br>会場費２区画合計：58,300円<br>
+                    <strong><span style="font-size: 1.25em; color: #555;">大人1名あたりの参加費は 5,000円 となります！</span></strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- 地図・アクセス (Iframe) -->
+        <div class="iframe-container fade-in">
+            <iframe src="https://yumeshima-outdoorsquare.com/access/"></iframe>
+        </div>
+          <!-- 現在のご予約内容 (JSで表示制御) -->
+        <div class="glass-card fade-in" id="user-answer-section" style="display: none; border: 2px solid var(--primary); background: #FFF5F5;">
+            <h2 class="sec-title" style="margin-bottom: 10px;"><span>REGISTERED</span>現在のご予約内容</h2>
+            <div id="user-answer-content" style="background: #fff; padding: 15px; border-radius: 12px; font-size: 0.9rem; line-height: 1.7; border: 1px solid #FFD1D1;">
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- 画像ポップアップ用モーダル（追加部分） -->
+    <div class="modal-overlay" id="image-modal">
+        <div class="close-modal">&times;</div>
+        <img src="" alt="Popup Image" class="modal-image" id="modal-img-tag">
+    </div>
+
+    <script>
+        //const MY_LIFF_ID = "2010768698-QSouqBB0"; 
+        const MY_LIFF_ID = "";
+        const GAS_WEB_APP_URL = "https://raw.githubusercontent.com/shingo-toyoshima-arch/skyperfectpark/main/data.json"; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('visible'); });
+            }, { threshold: 0.1 });
+            fadeElements.forEach(el => observer.observe(el));
+
+            // LIFF・データ取得処理
+            if (MY_LIFF_ID) {
+                liff.init({ liffId: MY_LIFF_ID }).then(() => {
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                    } else {
+                        liff.getProfile().then(profile => {
+                            document.getElementById('line-status').innerHTML = `👤 <strong>${profile.displayName}</strong> さんとしてログイン中`;
+                            fetchCurrentCounts(profile.userId);
+                        });
+                    }
+                }).catch(() => {
+                    document.getElementById('line-status').innerText = "💡 ブラウザ表示中";
+                    fetchCurrentCounts();
+                });
+            } else {
+                fetchCurrentCounts();
+            }
+
+            // --- 画像ポップアップ処理追加 ---
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-img-tag');
+            const menuImages = document.querySelectorAll('.menu-img');
+
+            menuImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    modalImg.src = img.src;
+                    modal.classList.add('active');
+                });
+            });
+
+            // モーダルの背景、または閉じるボタン（×）を押した時に閉じる
+            modal.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+        });
+
+        function fetchCurrentCounts(userId = '') {
+            // URLはGitHubのRaw URLを使用
+            let url = GAS_WEB_APP_URL + "?t=" + new Date().getTime();
+
+           fetch(url, { cache: 'no-store' }) // ★ キャッシュを強制的に無効化する設定を追加
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        
+                        // ① お知らせの表示（変更なし）
+                        if (data.messages && data.messages.length > 0) {
+                            const noticeSection = document.getElementById('notice-section');
+                            const messagesContainer = document.getElementById('messages-container');
+                            messagesContainer.innerHTML = '';
+
+                            data.messages.forEach(msg => {
+                                const msgDiv = document.createElement('div');
+                                msgDiv.className = 'message-box';
+                                msgDiv.innerHTML = `
+                                    <div class="message-sender">🗣️ ${msg.name} さんより・・</div>
+                                    <div class="message-text">${msg.message}</div>
+                                `;
+                                messagesContainer.appendChild(msgDiv);
+                            });
+                            noticeSection.style.display = 'block';
+                        }
+
+                        // ② 予約内容の表示（★ここを修正！）
+                        // JSON内の "users" の中から、自分の userId と一致するデータを探す
+                        if (userId && data.users && data.users[userId]) {
+                            renderUserData(data.users[userId]);
+                        }
+                        // ③ 【新規追加】車割り当ての表示
+                        if (data.cars && Object.keys(data.cars).length > 0) {
+                            const carSection = document.getElementById('car-section');
+                            const carContainer = document.getElementById('car-container');
+                            carContainer.innerHTML = ''; // 初期化
+
+                            for (const [carName, members] of Object.entries(data.cars)) {
+                                const carCard = document.createElement('div');
+                                carCard.className = 'car-card';
+                                
+                                let membersHtml = '';
+                                members.forEach(member => {
+                                    membersHtml += `<li>${member}</li>`;
+                                });
+
+                                // ★ 「直」かどうかの判定
+                                let icon = '🚗';
+                                let headerClass = 'car-name';
+                                
+                                if (carName === '直' || carName.includes('直行')) {
+                                    icon = '🚃🚶'; // 電車と徒歩アイコン
+                                    headerClass = 'car-name direct'; // 青系のスタイルを適用
+                                }
+
+                                carCard.innerHTML = `
+                                    <div class="${headerClass}">${icon} ${carName}</div>
+                                    <ul class="car-members">${membersHtml}</ul>
+                                `;
+                                carContainer.appendChild(carCard);
+                            }
+                            carSection.style.display = 'block';
+                        }
+                    }
+                })
+                .catch(err => console.log("データ取得エラー", err));
+        }
+        function renderUserData(u) {
+            const section = document.getElementById('user-answer-section');
+            const content = document.getElementById('user-answer-content');
+            
+            const isAttend = u.schedule && u.schedule.includes("10月17日");
+            const statusText = isAttend ? "⭕ 参加" : "❌ 不参加";
+
+            content.innerHTML = `
+                <strong>📅 出欠状況:</strong> ${statusText}<br>
+                ${isAttend ? `
+                <strong>🧑 大人人数:</strong> ${u.my_adults}名 （コース代目安: ¥${Number(u.adult_course).toLocaleString()}）<br>
+                <strong>🧒 子供人数:</strong> ${u.my_children}名 （コース代目安: ¥${Number(u.child_course).toLocaleString()}）<br>
+                <strong>➕ アラカルト:</strong> ${u.addon || 'なし'}<br>
+                <strong>💬 メッセージ/要望:</strong> ${u.comment || 'なし'}
+                ` : ''}
+            `;
+            section.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
